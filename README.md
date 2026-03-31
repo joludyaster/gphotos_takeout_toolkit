@@ -1,13 +1,13 @@
 <div align="center" dir="auto">
 <pre>
- ██████╗ ██████╗ ████████╗
-██╔════╝ ██╔══██╗╚══██╔══╝
-██║  ███╗██████╔╝   ██║   
-██║   ██║██╔═══╝    ██║   
-╚██████╔╝██║        ██║   
- ╚═════╝ ╚═╝        ╚═╝   
+ ██████╗ ██████╗ ███████╗
+██╔════╝ ██╔══██╗██╔════╝
+██║  ███╗██████╔╝███████╗
+██║   ██║██╔═══╝ ╚════██║
+╚██████╔╝██║     ███████║
+ ╚═════╝ ╚═╝     ╚══════╝
 ----------------------------
-                  google photos transporter                  
+                  google photos sorter                  
 </pre>
 </div>
 
@@ -32,14 +32,24 @@ Okay, now let's see the steps to actually run the project.
 
 > Clone the project on your local machine:
 ```git
-git clone https://github.com/joludyaster/google_photos_transporter.git
+https://github.com/joludyaster/google_photos_sorter.git
 ```
 
-> In `google_photos_transporter.py` change variable `who_to_move` to the name of the user you want:
+> In `google_photos_sorter.py` change variable `owner` to the name of the user you want:
 ```python
 def main():
   ...
-  who_to_move = "anything"
+  owner = "anything"
 ```
 
-> Run the project by typing `python google_photos_transporter.py` or if you're in IDE, just run the file.
+> Additionally, set `additional_file_move` to `True` if you want all of your files to be moved into one folder, it adds extra space:
+```python
+def main():
+  ...
+  additional_file_move = True
+```
+
+> Run the project by typing `python google_photos_sorter.py` or if you're in IDE, just run the file.
+
+## Roadmap
+* [ ] Merge metadata and a file that's being moved 
