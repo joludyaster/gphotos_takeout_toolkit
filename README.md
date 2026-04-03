@@ -35,7 +35,7 @@ Okay, now let's see the steps to actually run the project.
 https://github.com/joludyaster/google_photos_sorter.git
 ```
 
-> In `google_photos_sorter.py` change variable `owner` to the name of the user you want:
+> In `main.py` in `main()` change variable `owner` to the name of the user you want:
 ```python
 def main():
   ...
@@ -49,7 +49,44 @@ def main():
   additional_file_move = True
 ```
 
-> Run the project by typing `python google_photos_sorter.py` or if you're in IDE, just run the file.
+> Run the project by typing `python main.py` or if you're in IDE, just run the file.
+
+## Dependencies
+- [PyExifTool](https://pypi.org/project/PyExifTool/)
+
+## Prerequisites
+
+To run the script, you need to have [ExifTool](https://exiftool.org/) installed on your machine as that is the required tool to restore metadata. Script checks whether you have it installed or not.
+
+> Windows/Mac
+```python
+https://exiftool.org
+```
+
+> Ubuntu
+```bash
+sudo apt install libimage-exiftool-perl
+```
+
+> CentOS/RHEL
+```bash
+yum install perl-Image-ExifTool
+```
+
+> Arch
+```bash
+sudo pacman -S perl-image-exiftool
+```
+
+## Edge cases
+Script currently performs well with files that have not been corrupted or incorrectly renamed. But there are cases when this script might break:
+
+### Webp files that were renamed to be .jpg
+Google renames files with extensions .webp to .jpg and so when the script tries to restore metadata, error would occur because the file has an invalid extension.
+
+### Files from different apps or sources
+If files were added to Google Photos from TikTok, Instagram, or any related social media, Google Takeout modifies the names of those files and it's hard to determine which .json metadata belongs to that file. If you have a solution, feel free to modify the code :D
 
 ## Roadmap
-* [ ] Merge metadata and a file that's being moved 
+* [x] Merge metadata and a file that's being moved 
+
