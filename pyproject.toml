@@ -1,7 +1,10 @@
 [project]
 name = "google-photos-sorter"
-version = "0.1.0"
+version = "0.2.0"
 description = "Application to sort downloaded google photos by their date."
 readme = "README.md"
 requires-python = ">=3.14"
-dependencies = []
+dependencies = [
+    "pyexiftool>=0.5.6",
+    "uv==0.11.3",
+]
