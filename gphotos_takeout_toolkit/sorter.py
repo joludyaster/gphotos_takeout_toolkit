@@ -1,21 +1,22 @@
-import shutil
 import json
 import logging
+import re
+import shutil
+
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
-from metadata_restorer import MetadataRestorer
-import re
+from .metadata import Metadata
 
 logger = logging.getLogger(__name__)
 
 
-class GooglePhotosSorter:
+class Sorter:
     def __init__(
             self,
-            origin_folder: Path,
-            destination_folder: Path,
-            owner: str,
+            origin_path: Path,
+            destination_path: Path,
+            owner_name: str,
             files: list[str],
             additional_file_move: bool = False
     ):
@@ -24,11 +25,11 @@ class GooglePhotosSorter:
 
         Parameters
         ----------
-        origin_folder : Path
+        origin_path : Path
             Folder from where the files will be moved
-        destination_folder : Path
+        destination_path : Path
             Folder to where the files will be moved
-        owner : str
+        owner_name : str
             Owner of the files [doesn't really matter]
         files : list[str]
             List of files to sort
@@ -36,10 +37,10 @@ class GooglePhotosSorter:
             Whether all the files should be moved into one folder without sorting, by default False
         """
 
-        self.origin_folder = origin_folder
+        self.origin_folder = origin_path
         self.files = files
-        self.destination_folder = destination_folder
-        self.owner = owner
+        self.destination_folder = destination_path
+        self.owner = owner_name
         self.additional_file_move = additional_file_move
 
         self.photo_formats = [
@@ -118,7 +119,7 @@ class GooglePhotosSorter:
                     logger.error("Format of the metadata is not dictionary, skipping...")
                     continue
 
-                get_photo_taken_time = get_metadata.get("photoTakenTime", None)
+                get_photo_taken_time = get_metadata.get("photoTakenTime")
 
                 if get_photo_taken_time is None:
                     logger.error(f"Photo taken time was not found. Checking next file...")
@@ -129,7 +130,7 @@ class GooglePhotosSorter:
                     logger.error(f"Photo taken time was not found. Checking next file...")
                     continue
 
-                get_taken_data = datetime.fromtimestamp(timestamp=get_timestamp)
+                get_taken_data = datetime.fromtimestamp(get_timestamp)
                 format_date = get_taken_data.strftime("%Y-%m-%d").replace("-", "_")
 
                 format_selector = self._get_folder_format(extension=file.rsplit(".", 1)[-1])
@@ -170,8 +171,9 @@ class GooglePhotosSorter:
         try:
             with open(json_path, "r", encoding="utf-8") as f:
                 title = json.load(f).get("title", "")
+
             if not title:
-                return True
+                return False
 
             normalized_filename = re.sub(r"\(\d+\)", "", filename).strip()
 
@@ -189,10 +191,7 @@ class GooglePhotosSorter:
             if title_ext.lower() != file_ext.lower():
                 return False
 
-            return (
-                    (title_stem.startswith(file_stem) and len(file_stem) >= 10)
-                    or (file_stem.startswith(title_stem) and len(title_stem) >= 10)
-            )
+            return False
 
         except Exception:
             return False
@@ -309,11 +308,11 @@ class GooglePhotosSorter:
 
     @staticmethod
     def _restore_metadata(file_path: Path, metadata: dict) -> bool:
-        metadata_restorer = MetadataRestorer(
+        metadata_restorer = Metadata(
             file_path=file_path,
             metadata=metadata
         )
-        result = metadata_restorer.restore_metadata()
+        result = metadata_restorer.restore()
         return result
 
     def _move_failed_file(self, file_path: Path) -> bool:
@@ -324,7 +323,7 @@ class GooglePhotosSorter:
         ----------
         file_path : Path
             Path to the file that has to be moved
-            
+
         Returns
         -------
         bool
@@ -364,14 +363,6 @@ class GooglePhotosSorter:
                 logger.warning(f"The path {folder}/{file} already exists, skipping...")
                 return
 
-            restore_metadata = self._restore_metadata(
-                file_path=Path(self.origin_folder / file),
-                metadata=metadata
-            )
-
-            if not restore_metadata:
-                logger.error(f"Couldn't restore metadata for the file: {file_path}")
-
             if self.additional_file_move:
                 Path(self.destination_folder / "all-files").mkdir(parents=True, exist_ok=True)
                 shutil.copy2(
@@ -383,6 +374,15 @@ class GooglePhotosSorter:
                 src=f"{self.origin_folder}/{file}",
                 dst=folder
             )
+
+            restore_metadata = self._restore_metadata(
+                file_path=file_path,
+                metadata=metadata
+            )
+
+            if not restore_metadata:
+                logger.error(f"Couldn't restore metadata for the file: {file_path}")
+
         except Exception:
             logger.exception(f"Something went wrong while transporting {file} to -> {folder}")
             return
