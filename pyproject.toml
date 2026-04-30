@@ -1,10 +1,38 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
-name = "google-photos-sorter"
-version = "0.2.0"
-description = "Application to sort downloaded google photos by their date."
+name = "gphotos_takeout_toolkit"
+version = "0.3.0"
+description = "A library that sorts Google Takeout Photos by their creation date with metadata preserved."
 readme = "README.md"
-requires-python = ">=3.14"
+license = { text = "MIT" }
+authors = [{ name = "Davyd"}]
+keywords = ["google-photos", "takeout", "exif", "cli"]
+classifiers = [
+    "Programming Language :: Python :: 3.11",
+    "License :: OSI Approved :: MIT License",
+    "Environment :: Console",
+]
+requires-python = ">=3.11"
 dependencies = [
     "pyexiftool>=0.5.6",
-    "uv==0.11.3",
+    "rich>=15.0.0",
+    "typer>=0.25.0",
 ]
+
+[project.scripts]
+# Specificied the path to the CLI (Command-Line Interface) script
+gphotos_takeout_toolkit = "gphotos_takeout_toolkit.cli:app"
+
+[tool.ruff]
+# Maximum allowed length of characters per row
+line-length = 100
+
+# Defines a minimum python version to be used
+target-version = "py311"
+
+[tool.mypy]
+# Enables all optional safety checks, mostly type safety checks
+strict = true
