@@ -78,7 +78,6 @@ sudo pacman -S perl-image-exiftool
 
 - [PyExifTool](https://pypi.org/project/PyExifTool/)
 - [Typer](https://pypi.org/project/typer-cli/)
-- [Rich](https://rich.readthedocs.io/en/latest/introduction.html#installation)
 
 ### Installation
 
